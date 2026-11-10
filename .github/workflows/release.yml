@@ -1,8 +1,8 @@
-name: Publish v0.2.0
+name: Publish v0.3.0
 on:
   push:
     branches: [main]
-    paths: [releases/v0.2.0.md]
+    paths: [releases/v0.3.0.md]
   workflow_dispatch:
 permissions:
   contents: write
@@ -14,7 +14,7 @@ jobs:
       - name: Package both plugins
         run: |
           set -eu
-          for plugin in LayoutDesk Proofdesk; do
+          for plugin in LayoutDesk ProofDesk; do
             node --check "$plugin/code.js"
             cp LICENSE "$plugin/"
             zip -qr "$plugin.zip" "$plugin"
@@ -24,4 +24,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v0.2.0 LayoutDesk.zip Proofdesk.zip --target "$GITHUB_SHA" --title "Figma Desk Tools v0.2.0 · 双语版 / Bilingual release" --notes-file releases/v0.2.0.md
+          gh release create v0.3.0 LayoutDesk.zip ProofDesk.zip --target "$GITHUB_SHA" --title "Figma Desk Tools v0.3.0 · Layout Desk & ProofDesk" --notes-file releases/v0.3.0.md

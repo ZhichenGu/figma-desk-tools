@@ -99,7 +99,7 @@ function frame(parent,name,x,y,w,h){
 }
 async function reopen(){
  const root=figma.currentPage.selection[0]
- if(figma.currentPage.selection.length!==1||!root)throw Error('请选中一个排版台生成的画板。')
+ if(figma.currentPage.selection.length!==1||!root)throw Error('请选中一个Layout Desk生成的画板。')
  const parts=Number(root.getPluginData('deskParts'))
  if(!parts)throw Error('这个画板没有保存编辑记录。')
  let json=''
@@ -131,7 +131,7 @@ async function generate(m){
   root.fills=paint(0xffffff)
   const referenceHash=figma.createImage(m.referenceBytes).hash
   const archive=figma.createRectangle();root.appendChild(archive)
-  archive.name='排版台 · 编辑参考';archive.fills=[{type:'IMAGE',scaleMode:'FIT',imageHash:referenceHash}];archive.visible=false;archive.locked=true
+  archive.name='Layout Desk · 编辑参考';archive.fills=[{type:'IMAGE',scaleMode:'FIT',imageHash:referenceHash}];archive.visible=false;archive.locked=true
   for(const s of m.slots){
    if(s.k==='line'){
     const l=figma.createLine();root.appendChild(l);l.resize(Math.max(.01,Math.hypot(s.w,s.h)),0);l.rotation=-Math.atan2(s.h,s.w)*180/Math.PI;l.x=s.x;l.y=s.y;l.strokes=paint(0xaaa7a0);l.name='连接线';continue
@@ -151,7 +151,7 @@ async function generate(m){
    if(text.characters && text.height>s.h-2*pad+1){overflow++;const dot=figma.createEllipse();root.appendChild(dot);dot.name='文字溢出 · '+s.n;dot.resize(8,8);dot.x=s.x+s.w-9;dot.y=s.y+1;dot.fills=paint(0xdb4438)}
   }
   const slots=m.slots.map(({bytes,asset,font,...slot})=>slot)
-  const json=JSON.stringify({name:m.name,w:m.w,h:m.h,slots,referenceHash})
+  const json=JSON.stringify({name:m.name,w:m.w,h:m.h,slots,referenceHash,source:m.source})
   const chunks=json.match(/[\s\S]{1,8000}/gu)||[]
   chunks.forEach((part,i)=>root.setPluginData('desk'+i,part));root.setPluginData('deskParts',String(chunks.length))
   page.selection=[root];figma.viewport.scrollAndZoomIntoView([root]);figma.commitUndo();anchor={page:page.id,x:root.x+root.width+64,y:root.y}
@@ -159,6 +159,42 @@ async function generate(m){
  }catch(e){root.remove();throw e}
 }
 figma.ui.onmessage=async m=>{
+ const root=figma.root
+ if(m.type==='getCatalog'||m.type==='editCatalog'){
+  const key=id=>'ldref_'+id
+  const read=()=>{
+   const hidden=[],saved=[]
+   for(const k of root.getPluginDataKeys().filter(k=>/^ldref_(base-|public-)[a-z0-9-]+$/.test(k))){
+    const id=k.slice(6),value=root.getPluginData(k)
+    if(id.startsWith('base-'))hidden.push(id)
+    else{
+     let raw='';for(let i=0;i<Number(value);i++)raw+=root.getPluginData(k+'_'+i)
+     saved.push({id,v:JSON.parse(raw)})
+    }
+   }
+   return {hidden,saved}
+  }
+  const before=new Map()
+  function write(k,value){if(!before.has(k))before.set(k,root.getPluginData(k));root.setPluginData(k,value)}
+  try{
+   if(m.type==='editCatalog')for(const change of m.data){
+    const {id,visible,v}=change,k=key(id)
+    if(!/^(base-|public-)[a-z0-9-]+$/.test(id))throw Error()
+    if(id.startsWith('base-'))write(k,visible?'':'1')
+    else if(visible&&!root.getPluginData(k)){
+     const raw=JSON.stringify(v),count=Math.ceil(raw.length/16000)
+     for(let i=0;i<count;i++)write(k+'_'+i,raw.slice(i*16000,(i+1)*16000))
+     write(k,String(count))
+    }else if(!visible){
+     for(let i=0;i<Number(root.getPluginData(k));i++)write(k+'_'+i,'')
+     write(k,'')
+    }
+   }
+   post('catalogState',{state:read(),edited:m.type==='editCatalog'})
+  }catch(e){for(const [k,value] of before)root.setPluginData(k,value);post('catalogFail',null)}
+  return
+ }
+
  // Set this plugin's GitHub repository URL when it is published.
  const githubRepository = 'https://github.com/ZhichenGu/figma-desk-tools/releases/latest'
  if(m.type==='getLanguageSettings'){
@@ -169,6 +205,11 @@ figma.ui.onmessage=async m=>{
  }
  if(m.type==='saveLanguage'){
   if(['zh','en'].includes(m.language))await figma.clientStorage.setAsync('interfaceLanguage',m.language)
+  return
+ }
+ if(m.type==='searchPinterest'){
+  const query=typeof m.data==='string'?m.data.trim():''
+  figma.openExternal(query?'https://www.pinterest.com/search/pins/?q='+encodeURIComponent(query):'https://www.pinterest.com/')
   return
  }
  if(m.type==='openProjectRepo'){

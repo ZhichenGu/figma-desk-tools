@@ -1,5 +1,5 @@
 {
-  "name": "排版台 · Layout Desk",
+  "name": "Layout Desk",
   "id": "1583295627041910359",
   "api": "1.0.0",
   "main": "code.js",
@@ -10,7 +10,15 @@
   "documentAccess": "dynamic-page",
   "networkAccess": {
     "allowedDomains": [
-      "none"
+      "https://raw.githubusercontent.com",
+      "https://www.loc.gov",
+      "https://loc.gov",
+      "https://cdn.loc.gov",
+      "https://tile.loc.gov",
+      "https://chroniclingamerica.loc.gov",
+      "https://commons.wikimedia.org",
+      "https://upload.wikimedia.org",
+      "https://thumb.wikimedia.org"
     ],
     "devAllowedDomains": [
       "ws://localhost:48371"
