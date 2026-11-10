@@ -1,0 +1,27 @@
+name: Publish v0.2.0
+on:
+  push:
+    branches: [main]
+    paths: [releases/v0.2.0.md]
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Package both plugins
+        run: |
+          set -eu
+          for plugin in LayoutDesk Proofdesk; do
+            node --check "$plugin/code.js"
+            cp LICENSE "$plugin/"
+            zip -qr "$plugin.zip" "$plugin"
+            unzip -tq "$plugin.zip"
+          done
+      - name: Publish version and downloads
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create v0.2.0 LayoutDesk.zip Proofdesk.zip --target "$GITHUB_SHA" --title "Figma Desk Tools v0.2.0 · 双语版 / Bilingual release" --notes-file releases/v0.2.0.md
