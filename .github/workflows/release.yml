@@ -1,8 +1,8 @@
-name: Publish v0.3.1
+name: Publish v0.3.2
 on:
   push:
     branches: [main]
-    paths: [releases/v0.3.1.md]
+    paths: [releases/v0.3.2.md]
   workflow_dispatch:
 permissions:
   contents: write
@@ -24,4 +24,4 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release create v0.3.1 LayoutDesk.zip ProofDesk.zip --target "$GITHUB_SHA" --title "Figma Desk Tools v0.3.1 · Layout Desk & ProofDesk" --notes-file releases/v0.3.1.md
+          gh release create v0.3.2 LayoutDesk.zip ProofDesk.zip --target "$GITHUB_SHA" --title "Figma Desk Tools v0.3.2 · Layout Desk & ProofDesk" --notes-file releases/v0.3.2.md

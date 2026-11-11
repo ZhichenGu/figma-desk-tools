@@ -31,9 +31,13 @@ The optional cross-window capture helper runs on Apple Silicon Macs. Keep it bes
 
 **Lay out an interview.** Choose an interview layout, select its photo area, then use **Pick from canvas** to add a portrait. Repeat with a quote. Red dots mark overflowing text. Choose **Create in Figma** to generate your frame.
 
-**统一字号。** 在 Figma 选中画板，打开 ProofDesk，选择「字号」，点原值、填新值，再核对范围并应用。
+**调整字体。** 在 Figma 选中画板，打开校样台，选择要调整的属性和原值。新字体和字形从兼容列表中选择。字号、行高和字间距可以选预设，也可以用 − / ＋ 微调。当选区只有一个原值时，校样台会自动选中它。核对受影响的文字后点「应用修改」。
 
-**Standardise type sizes.** Select a frame, open ProofDesk, choose **Size**, pick an existing size and enter a new one. Review the affected text before applying the change.
+**Adjust typography.** Select a frame, open ProofDesk and choose a property and its original value. Pick a compatible font family or style from the list. For size, line height and letter spacing, choose a preset or use − / ＋. A single original value is selected automatically. Review the affected text before applying.
+
+**一键抠图。** 在画布上选中一张图片，进入「自动抠图」，点「一键抠图」按推荐设置移除底色。预览满意后点「应用到选图」。需要修边时展开「用笔刷修边」，擦除多余背景或还原误删部分。
+
+**Remove a background.** Select an image on the canvas and choose **Remove background** in the cutout panel. Review the transparent preview and apply it to the selection. For edge corrections, open **Refine with brush** to erase remaining background or restore part of the subject.
 
 ## 参与开发 · Contributing
 

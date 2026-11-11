@@ -165,6 +165,10 @@ async function handleImage(message) {
 figma.ui.onmessage=async m=>{
  // Set this plugin's GitHub repository URL when it is published.
  const githubRepository = 'https://github.com/ZhichenGu/figma-desk-tools/releases/latest'
+ if(m.type==='listFonts'){
+  try{post('fontCatalog',(await figma.listAvailableFontsAsync()).map(f=>f.fontName))}catch{}
+  return
+ }
  if(m.type==='getLanguageSettings'){
   let language
   try{language=await figma.clientStorage.getAsync('interfaceLanguage')}catch(e){}
